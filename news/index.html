@@ -1,1 +1,239 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>공지·보도 | 국제공익자격인증재단</title>
+  <meta name="description" content="국제공익자격인증재단 공지·보도자료·행사 소식." />
+  <meta name="theme-color" content="#0b0f19" />
+  <link rel="icon" href="../assets/images/logo.png" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <div class="brand">
+        <img class="brand__logo" src="../assets/images/logo.png" alt="국제공익자격인증재단 로고" />
+        <div class="brand__text">
+          <strong class="brand__name">국제공익자격인증재단</strong>
+          <span class="brand__tag">News · Notice · Press</span>
+        </div>
+      </div>
+      <a class="homebtn" href="../">HOME</a>
+    </div>
+  </header>
 
+  <main class="page">
+    <div class="wrap">
+      <header class="page-head">
+        <div>
+          <h1>공지·보도</h1>
+          <p class="lead">
+            재단의 공지, 보도자료, 행사 소식을 제공합니다.<br/>
+            <span class="muted">구조 >> 교차원리, 교차원리 기반 무도</span>
+          </p>
+        </div>
+      </header>
+
+      <!-- 필터/검색 -->
+      <section class="card">
+        <h2>빠른 찾기</h2>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+          <select id="filter" style="min-width:160px; padding:12px 12px; border-radius:16px; border:1px solid rgba(231,236,255,.14); background:rgba(0,0,0,.22); color:rgba(231,236,255,.92)">
+            <option value="ALL">전체</option>
+            <option value="NOTICE">공지</option>
+            <option value="PRESS">보도자료</option>
+            <option value="EVENT">행사</option>
+          </select>
+
+          <input id="q" type="text" placeholder="검색어(예: 조회, 규정, 인증, 행사)"
+                 style="flex:1; min-width:220px; padding:12px 12px; border-radius:16px; border:1px solid rgba(231,236,255,.14); background:rgba(0,0,0,.22); color:rgba(231,236,255,.92)" />
+          <button class="btn btn--primary" id="btn">검색</button>
+        </div>
+
+        <p class="muted" style="margin-top:10px; font-size:13px">
+          ※ 새 글은 아래 데이터 배열(NEWS_DATA)에 추가만 하면 됩니다. (서버 없이도 운영 가능)
+        </p>
+      </section>
+
+      <!-- 리스트 -->
+      <section class="card" style="margin-top:12px">
+        <h2>최신 소식</h2>
+        <div id="list" style="display:grid; gap:10px; margin-top:12px"></div>
+      </section>
+
+      <!-- 운영 팁 -->
+      <section class="card" style="margin-top:12px">
+        <h2>운영 팁</h2>
+        <ul class="list">
+          <li><b>보도자료</b>는 “제목/부제/본문/문의처” 4요소로 고정하면 아주 ‘공식’해집니다.</li>
+          <li><b>공지</b>는 “적용일/대상/변경요약/문의”로 정리하면 민원 감소!</li>
+          <li><b>행사</b>는 “일시/장소/대상/신청링크/준비물”만 있어도 완성입니다.</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <!-- 상세 팝업(모달) -->
+  <dialog id="modal" style="max-width:860px; width:calc(100% - 24px); border:none; border-radius:18px; padding:0; background:rgba(15,23,42,.96); color:rgba(231,236,255,.92); box-shadow:0 18px 45px rgba(0,0,0,.45)">
+    <div style="padding:16px 16px 12px; border-bottom:1px solid rgba(231,236,255,.12); display:flex; gap:10px; align-items:flex-start; justify-content:space-between">
+      <div>
+        <div id="mType" style="display:inline-flex; padding:7px 10px; border-radius:999px; border:1px solid rgba(231,236,255,.14); background:rgba(255,255,255,.04); font-size:12px; margin-bottom:8px">TYPE</div>
+        <div id="mTitle" style="font-size:20px; font-weight:900; line-height:1.25">제목</div>
+        <div id="mMeta" style="margin-top:6px; color:rgba(231,236,255,.72); font-size:13px">META</div>
+      </div>
+      <button class="btn" id="closeBtn" style="height:42px">닫기</button>
+    </div>
+    <div style="padding:16px">
+      <div id="mSub" class="muted" style="font-weight:800; margin-bottom:10px"></div>
+      <div id="mBody" class="muted" style="line-height:1.8; white-space:pre-wrap"></div>
+      <div id="mContact" style="margin-top:14px; padding:12px; border-radius:16px; border:1px solid rgba(231,236,255,.12); background:rgba(0,0,0,.18)">
+        <b>문의</b> <span class="muted" id="mContactText"></span>
+      </div>
+    </div>
+  </dialog>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div>
+        <strong>국제공익자격인증재단</strong>
+        <p class="muted">News · Notice · Press</p>
+      </div>
+      <div class="footer__meta">
+        <span>© <span id="year"></span> IPCF. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/app.js"></script>
+  <script>
+    // ✅ 여기만 추가/수정하면 뉴스 운영 끝
+    const NEWS_DATA = [
+      {
+        id: "2026-02-26-press-01",
+        type: "PRESS",
+        date: "2026-02-26",
+        title: "국제공익자격인증재단, 공익 자격·인증 조회(검증) 서비스 공개",
+        subtitle: "기준·절차·검증의 구조로 ‘확인 가능한 신뢰’를 구축",
+        body:
+`국제공익자격인증재단은 공익 기반 자격·인증의 신뢰를 강화하기 위해 코드 기반 조회(검증) 서비스를 공개했습니다.
+
+본 서비스는 자격·인증의 상태를 VALID(유효), EXPIRED(만료), SUSPENDED(정지), REVOKED(폐기)로 구분하여 제공하며,
+절차 기반 발급 및 갱신 체계를 통해 운영됩니다.
+
+재단은 향후 기준·규정의 정기 개정, 심사 기록의 표준화, 자료실(서식/가이드) 제공을 통해
+운영 투명성과 현장 활용성을 지속 강화할 계획입니다.`,
+        contact: "example@ipcf.org / +82-00-0000-0000"
+      },
+      {
+        id: "2026-02-26-notice-01",
+        type: "NOTICE",
+        date: "2026-02-26",
+        title: "인증 상태 정의(VALID/EXPIRED/SUSPENDED/REVOKED) 안내",
+        subtitle: "조회 결과 해석 가이드",
+        body:
+`조회 서비스는 코드 입력을 통해 인증 상태를 제공합니다.
+
+- VALID: 유효기간 내 정상 상태
+- EXPIRED: 유효기간 종료(갱신 필요)
+- SUSPENDED: 일시 정지(보완/재심 필요)
+- REVOKED: 효력 폐기(중대 위반 등)
+
+자세한 내용은 ‘기준·규정’ 페이지 및 자료실의 가이드를 참고하세요.`,
+        contact: "example@ipcf.org"
+      },
+      {
+        id: "2026-03-15-event-01",
+        type: "EVENT",
+        date: "2026-03-15",
+        title: "공익 인증 운영 설명회(온라인) 개최(예시)",
+        subtitle: "신청 절차·서식 작성·조회 운영 안내",
+        body:
+`(예시 텍스트)
+일시: 2026-03-15 19:00~20:00
+대상: 신청 예정 기관/지도자/운영자
+내용: 신청 절차, 서식 작성법, 심사 흐름, 조회 서비스 운영
+신청: contact 페이지로 문의`,
+        contact: "example@ipcf.org"
+      }
+    ];
+
+    const $ = (s) => document.querySelector(s);
+    const esc = (t) => String(t ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const typeLabel = (t) => ({NOTICE:"공지", PRESS:"보도자료", EVENT:"행사"}[t] || t);
+
+    const badgeStyle = (t) => {
+      if (t === "PRESS") return ["rgba(58,160,255,.10)", "rgba(58,160,255,.35)"];
+      if (t === "NOTICE") return ["rgba(214,179,90,.08)", "rgba(214,179,90,.35)"];
+      if (t === "EVENT") return ["rgba(231,236,255,.06)", "rgba(231,236,255,.18)"];
+      return ["rgba(231,236,255,.06)", "rgba(231,236,255,.18)"];
+    };
+
+    function renderList(items){
+      const box = $("#list");
+      if (!items.length){
+        box.innerHTML = `<div class="muted" style="padding:12px">검색 결과가 없습니다.</div>`;
+        return;
+      }
+      box.innerHTML = items
+        .sort((a,b) => (b.date||"").localeCompare(a.date||""))
+        .map(item => {
+          const [bg, bd] = badgeStyle(item.type);
+          return `
+            <button data-id="${esc(item.id)}"
+              style="text-align:left; width:100%; padding:14px; border-radius:18px; border:1px solid rgba(231,236,255,.14); background:rgba(255,255,255,.03); cursor:pointer">
+              <div style="display:flex; gap:10px; justify-content:space-between; align-items:flex-start; flex-wrap:wrap">
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+                  <span style="display:inline-flex; padding:7px 10px; border-radius:999px; border:1px solid ${bd}; background:${bg}; font-size:12px; font-weight:900">
+                    ${esc(typeLabel(item.type))}
+                  </span>
+                  <span style="color:rgba(231,236,255,.72); font-size:13px">${esc(item.date)}</span>
+                </div>
+                <span style="color:rgba(58,160,255,.92); font-weight:900">자세히 →</span>
+              </div>
+              <div style="margin-top:8px; font-weight:900; font-size:16px; line-height:1.35">${esc(item.title)}</div>
+              <div class="muted" style="margin-top:6px; font-size:13px; line-height:1.55">${esc(item.subtitle || "")}</div>
+            </button>
+          `;
+        }).join("");
+
+      box.querySelectorAll("button[data-id]").forEach(btn => {
+        btn.addEventListener("click", () => openModal(btn.getAttribute("data-id")));
+      });
+    }
+
+    const modal = $("#modal");
+    $("#closeBtn").addEventListener("click", () => modal.close());
+
+    function openModal(id){
+      const item = NEWS_DATA.find(x => x.id === id);
+      if(!item) return;
+      $("#mType").textContent = typeLabel(item.type);
+      $("#mTitle").textContent = item.title;
+      $("#mMeta").textContent = `${item.date} · ${typeLabel(item.type)}`;
+      $("#mSub").textContent = item.subtitle || "";
+      $("#mBody").textContent = item.body || "";
+      $("#mContactText").textContent = item.contact || "—";
+      modal.showModal();
+    }
+
+    function apply(){
+      const f = $("#filter").value;
+      const q = $("#q").value.trim().toLowerCase();
+      const items = NEWS_DATA.filter(x => {
+        const okType = (f === "ALL") ? true : x.type === f;
+        const blob = `${x.title||""} ${x.subtitle||""} ${x.body||""}`.toLowerCase();
+        const okQ = q ? blob.includes(q) : true;
+        return okType && okQ;
+      });
+      renderList(items);
+    }
+
+    $("#btn").addEventListener("click", apply);
+    $("#q").addEventListener("keydown", (e) => { if(e.key === "Enter") apply(); });
+    $("#filter").addEventListener("change", apply);
+
+    renderList(NEWS_DATA);
+  </script>
+</body>
+</html>
